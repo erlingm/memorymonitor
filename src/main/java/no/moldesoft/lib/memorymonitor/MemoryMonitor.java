@@ -14,10 +14,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class MemoryMonitor implements Runnable {
@@ -32,7 +29,7 @@ public class MemoryMonitor implements Runnable {
     private volatile boolean firstRun;
 
     public MemoryMonitor(Instant applicationStart, Mailer mailer, Locale locale, ZoneId zoneId) {
-        this.applicationStart = applicationStart;
+        this.applicationStart = Objects.requireNonNull(applicationStart,"applicationStart is required");
         this.locale = locale == null ? Locale.forLanguageTag("no_NO") : locale;
         this.mailer = mailer;
         this.zoneId = zoneId == null ? ZoneId.systemDefault() : zoneId;
@@ -53,6 +50,7 @@ public class MemoryMonitor implements Runnable {
     @Override
     public void run() {
         try {
+            Objects.requireNonNull(mailer, "No \"Mailer\" implementation supplied");
             executeAndSendMail();
             firstRun = false;
         } catch (Exception e) {
