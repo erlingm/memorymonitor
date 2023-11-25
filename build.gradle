@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "no.moldesoft.lib"
-version = "1.0"
+version = "1.1"
 
 repositories {
     maven {
@@ -38,7 +38,7 @@ publishing {
     }
 
     publications {
-        exceptions(MavenPublication) {
+        memorymonitor(MavenPublication) {
             from(components.java)
         }
     }

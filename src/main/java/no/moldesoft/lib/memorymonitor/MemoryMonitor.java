@@ -28,12 +28,14 @@ public class MemoryMonitor implements Runnable {
     private final Instant applicationStart;
     private final Mailer mailer;
     private final Locale locale;
+    private final ZoneId zoneId;
     private volatile boolean firstRun;
 
-    public MemoryMonitor(Instant applicationStart, Mailer mailer, Locale locale) {
+    public MemoryMonitor(Instant applicationStart, Mailer mailer, Locale locale, ZoneId zoneId) {
         this.applicationStart = applicationStart;
         this.locale = locale == null ? Locale.forLanguageTag("no_NO") : locale;
         this.mailer = mailer;
+        this.zoneId = zoneId == null ? ZoneId.systemDefault() : zoneId;
         this.runtime = Runtime.getRuntime();
         dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String hostname;
@@ -67,6 +69,10 @@ public class MemoryMonitor implements Runnable {
     }
 
     public String report() {
+        return report(zoneId);
+    }
+
+    public String report(ZoneId zoneId) {
         Instant now = Instant.now();
 
         long freeMemory = runtime.freeMemory();
@@ -82,9 +88,9 @@ public class MemoryMonitor implements Runnable {
         List<String> aboutMemoryPools = aboutMemoryPools();
 
         List<String> report = new ArrayList<>();
-        report.add("This report produced at:   " + ldt(now).format(dateTimeFormatter));
-        report.add("Application running since: " + ldt(applicationStart).format(dateTimeFormatter));
-        report.add("JVM started at:            " + ldt(jvmStart).format(dateTimeFormatter));
+        report.add("This report produced at:   " + ldt(now, zoneId).format(dateTimeFormatter));
+        report.add("Application running since: " + ldt(applicationStart, zoneId).format(dateTimeFormatter));
+        report.add("JVM started at:            " + ldt(jvmStart, zoneId).format(dateTimeFormatter));
         report.add(runningTime("Application running time:  ", applicationStart, now));
         report.add(runningTime("JVM running time:          ", jvmStart, now));
         if (firstRun) {
@@ -101,8 +107,8 @@ public class MemoryMonitor implements Runnable {
         return String.join("\r\n", report);
     }
 
-    private LocalDateTime ldt(Instant instant) {
-        return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+    private LocalDateTime ldt(Instant instant, ZoneId zoneId) {
+        return instant.atZone(zoneId).toLocalDateTime();
     }
 
     private List<String> aboutMemoryPools() {
