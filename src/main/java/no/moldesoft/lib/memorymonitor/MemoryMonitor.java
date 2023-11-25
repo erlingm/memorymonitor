@@ -1,5 +1,6 @@
 package no.moldesoft.lib.memorymonitor;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ public class MemoryMonitor implements Runnable {
     private final ZoneId zoneId;
     private volatile boolean firstRun;
 
-    public MemoryMonitor(Instant applicationStart, Mailer mailer, Locale locale, ZoneId zoneId) {
+    public MemoryMonitor(@NotNull Instant applicationStart, Mailer mailer, Locale locale, ZoneId zoneId) {
         this.applicationStart = Objects.requireNonNull(applicationStart,"applicationStart is required");
         this.locale = locale == null ? Locale.forLanguageTag("no_NO") : locale;
         this.mailer = mailer;
