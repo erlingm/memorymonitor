@@ -7,11 +7,22 @@ group = "no.moldesoft.lib"
 version = "1.0"
 
 repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/erlingm/*")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
     mavenCentral()
 }
 
 java {
     withSourcesJar()
+}
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
 }
 
 publishing {
@@ -27,7 +38,7 @@ publishing {
     }
 
     publications {
-        gpr(MavenPublication) {
+        exceptions(MavenPublication) {
             from(components.java)
         }
     }
@@ -35,7 +46,8 @@ publishing {
 
 dependencies {
     api("org.slf4j:slf4j-api:2.0.9")
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    api("no.moldesoft.lib:exceptions:1.0")
+    testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 

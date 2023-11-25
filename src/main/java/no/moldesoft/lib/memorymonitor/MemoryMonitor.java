@@ -59,6 +59,14 @@ public class MemoryMonitor implements Runnable {
     }
 
     private void executeAndSendMail() {
+        String body = report();
+        String title = "Memory snapshot [from " + hostname + ']';
+        String from = "memorymonitor@kf.no";
+        String to = "info@moldesoft.no";
+        mailer.sendMail(from, to, title, body);
+    }
+
+    public String report() {
         Instant now = Instant.now();
 
         long freeMemory = runtime.freeMemory();
@@ -90,12 +98,7 @@ public class MemoryMonitor implements Runnable {
         report.add("");
         report.addAll(aboutMemoryPools);
 
-        String title = "LTK: memory snapshot [from " + hostname + ']';
-
-        String body = String.join("\r\n", report);
-        String from = "memorymonitor@kf.no";
-        String to = "info@moldesoft.no";
-        mailer.sendMail(from, to, title, body);
+        return String.join("\r\n", report);
     }
 
     private LocalDateTime ldt(Instant instant) {
